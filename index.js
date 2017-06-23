@@ -84,11 +84,25 @@ function getNovaexchangeData(coin) {
 }
 
 function getPercentage(perc) {
+  var string = '';
+
   if (perc >= 0) {
-    return '+' + perc + '% 🔵';
+    string += '+' + perc + '% 🔵  ';
   } else {
-    return perc + '% 🔴';
+    string += perc + '% 🔴  ';
   }
+
+  if (perc >= 100) {
+    string += '🚀 🌕';
+  } else if (perc >= 50) {
+    string += '🚀';
+  } else if (perc >= 30) {
+    string += '🛩☁️';
+  } else if (perc >= 15) {
+    string += '🚤';
+  }
+
+  return string;
 }
 
 function round(num) {
