@@ -83,6 +83,18 @@ function getNovaexchangeData(coin) {
   return coindata;
 }
 
+function getPercentage(perc) {
+  if (perc >= 0) {
+    return '+' + perc + '% 🔵';
+  } else {
+    return perc + '% 🔴';
+  }
+}
+
+function round(num) {
+  return Math.round(num * 100) / 100;
+}
+
 bot.onText(/\/p (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
   const coin = match[1].toUpperCase();
@@ -94,40 +106,44 @@ bot.onText(/\/p (.+)/, (msg, match) => {
   var message = [];
 
   if (poloniexData !== null) {
-      message.push('Poloniex: BTC / ' + coin);
-      message.push('Last price: ' + poloniexData.last);
-      message.push('24hr change: ' + poloniexData.percentChange);
-      message.push('24hr high / low: ' + poloniexData.high24hr + ' / ' + poloniexData.low24hr);
+      var percentChangePoloniex = Math.round((poloniexData.percentChange * 100) * 100) / 100;
+
+      message.push('➡️ Poloniex');
+      message.push(poloniexData.last + '  /  ' + getPercentage(percentChangePoloniex));
+      message.push('High / Low: ' + poloniexData.high24hr + ' / ' + poloniexData.low24hr);
+      message.push('Volume: ' + round(poloniexData.baseVolume) + ' BTC');
       message.push('');
-  } else {
-    message.push('Poloniex: BTC / ' + coin + ' Not found');
   }
 
-
   if (bittrexData !== null) {
-    let percentChangeBittrex = Math.round((bittrexData.Last / bittrexData.PrevDay * 100 - 100) * 100)/100;
+    const percentChangeBittrex = Math.round((bittrexData.Last / bittrexData.PrevDay * 100 - 100) * 100)/100;
 
-    message.push('Bittrex: BTC / ' + coin);
-    message.push('Last price: ' + bittrexData.Last);
-    message.push('24hr change: ' + percentChangeBittrex);
-    message.push('24hr high / low: ' + bittrexData.High + ' / ' + bittrexData.Low);
+    message.push('➡️ Bittrex');
+    message.push(bittrexData.Last + '  /  ' + getPercentage(percentChangeBittrex));
+    message.push('high / low: ' + bittrexData.High + ' / ' + bittrexData.Low);
+    message.push('Volume: ' + round(bittrexData.Volume) + ' BTC');
     message.push('');
-  } else {
-    message.push('Poloniex: BTC / ' + coin + ' Not found');
   }
 
   if (novaexchangeData !== null) {
-    message.push('Novaexchange: BTC / ' + coin);
-    message.push('Last price: ' + novaexchangeData.last_price);
-    message.push('24hr change: ' + novaexchangeData.change24h);
-    message.push('24hr high / low: ' + novaexchangeData.high24h + ' / ' + novaexchangeData.low24h);
+    message.push('➡️ Novaexchange');
+    message.push(novaexchangeData.last_price + '  /  ' + getPercentage(novaexchangeData.change24h));
+    message.push('high / low: ' + novaexchangeData.high24h + ' / ' + novaexchangeData.low24h);
+    message.push('Volume: ' + round(novaexchangeData.volume24h) + ' BTC');
     message.push('');
-  } else {
-    message.push('Novaexchange: BTC / ' + coin + ' Not found');
+  }
+
+  if (message.length !== 0) {
+    message.unshift('');
+    message.unshift('📈 BTC / ' + coin + ' 24hr');
   }
 
   if (fanboyApproved.indexOf(coin) !== -1) {
     message.push(coin + ' is Fanboy Approved 🔥');
+  }
+
+  if (message.length === 0) {
+    message.push(coin + ' was not found on Poloniex / Bittrex / Novaexchange');
   }
 
   sendMessage(chatId, message);
