@@ -1,43 +1,16 @@
 const TelegramBot = require('node-telegram-bot-api');
 const request = require('request');
+const options = require('./options');
 
 const token = '429017792:AAEEFiDAMmwvfQFbrwzNrpj8WWQ61y1DO1I';
 
 const bot = new TelegramBot(token, {polling: true});
-
-const intervalChats = [-237161017, 114791921];
-const options = {
-  host: 'novaexchange.com',
-  path: '/remote/v2/market/info/'
-};
 
 const ticker = {
   poloniex: null,
   bittrex: null,
   novaexchange: null
 };
-
-const fanboyApproved = [
-  'NLG',
-  'APX',
-  'ESP2',
-  'XRP'
-];
-
-const apis = [
-  {
-    name: 'poloniex',
-    ticker: 'https://poloniex.com/public?command=returnTicker'
-  },
-  {
-    name: 'bittrex',
-    ticker: 'https://bittrex.com/api/v1.1/public/getmarketsummaries'
-  },
-  {
-    name: 'novaexchange',
-    ticker: 'https://novaexchange.com/remote/v2/markets/'
-  }
-]
 
 
 function sendMessage(chatId, message) {
@@ -152,7 +125,7 @@ bot.onText(/\/p (.+)/, (msg, match) => {
     message.unshift('📈 BTC / ' + coin + ' 24hr');
   }
 
-  if (fanboyApproved.indexOf(coin) !== -1) {
+  if (options.fanboyApproved.indexOf(coin) !== -1) {
     message.push(coin + ' is Fanboy Approved 🔥');
   }
 
@@ -164,7 +137,7 @@ bot.onText(/\/p (.+)/, (msg, match) => {
 });
 
 setInterval(() => {
-  apis.forEach((api) => {
+  options.apis.forEach((api) => {
     request(api.ticker, function (error, response, body) {
       ticker[api.name] = JSON.parse(body);
     });
