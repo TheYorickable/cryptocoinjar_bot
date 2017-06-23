@@ -48,7 +48,7 @@ function sendMessage(chatId, message) {
     markup += txt + '\n';
   });
 
-  bot.sendMessage(chatId, markup);
+  bot.sendMessage(chatId, markup, {'parse_mode': 'Markdown'});
 }
 
 function getBittrexData(coin) {
@@ -123,7 +123,7 @@ bot.onText(/\/p (.+)/, (msg, match) => {
       var percentChangePoloniex = Math.round((poloniexData.percentChange * 100) * 100) / 100;
 
       message.push('➡️ Poloniex');
-      message.push(poloniexData.last + '  /  ' + getPercentage(percentChangePoloniex));
+      message.push('*' + poloniexData.last + '  /  ' + getPercentage(percentChangePoloniex) + '*');
       message.push('High / Low: ' + poloniexData.high24hr + ' / ' + poloniexData.low24hr);
       message.push('Volume: ' + round(poloniexData.baseVolume) + ' BTC');
       message.push('');
@@ -133,7 +133,7 @@ bot.onText(/\/p (.+)/, (msg, match) => {
     const percentChangeBittrex = Math.round((bittrexData.Last / bittrexData.PrevDay * 100 - 100) * 100)/100;
 
     message.push('➡️ Bittrex');
-    message.push(bittrexData.Last + '  /  ' + getPercentage(percentChangeBittrex));
+    message.push('*' + bittrexData.Last + '  /  ' + getPercentage(percentChangeBittrex) + '*');
     message.push('high / low: ' + bittrexData.High + ' / ' + bittrexData.Low);
     message.push('Volume: ' + round(bittrexData.Volume) + ' BTC');
     message.push('');
@@ -141,7 +141,7 @@ bot.onText(/\/p (.+)/, (msg, match) => {
 
   if (novaexchangeData !== null) {
     message.push('➡️ Novaexchange');
-    message.push(novaexchangeData.last_price + '  /  ' + getPercentage(novaexchangeData.change24h));
+    message.push('*' + novaexchangeData.last_price + '  /  ' + getPercentage(novaexchangeData.change24h) + '*');
     message.push('high / low: ' + novaexchangeData.high24h + ' / ' + novaexchangeData.low24h);
     message.push('Volume: ' + round(novaexchangeData.volume24h) + ' BTC');
     message.push('');
