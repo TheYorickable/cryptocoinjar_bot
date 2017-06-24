@@ -9,23 +9,23 @@ module.exports = {
 
   ],
   scamcoins: [
-    'DGB',
+
   ],
   apis: [
     {
-      name: 'poloniex',
+      name: 'Poloniex',
       ticker: 'https://poloniex.com/public?command=returnTicker'
     },
     {
-      name: 'bittrex',
+      name: 'Bittrex',
       ticker: 'https://bittrex.com/api/v1.1/public/getmarketsummaries'
     },
     {
-      name: 'novaexchange',
+      name: 'Novaexchange',
       ticker: 'https://novaexchange.com/remote/v2/markets/'
     },
     {
-      name: 'cryptopia',
+      name: 'Cryptopia',
       ticker: 'https://www.cryptopia.co.nz/api/GetMarkets'
     }
   ]

@@ -91,16 +91,16 @@ var utils = {
 
   parseTicker: (apiName, body) => {
     switch (apiName) {
-      case 'poloniex':
+      case 'Poloniex':
         return utils.parseApi.poloniex(body);
         break;
-      case 'bittrex':
+      case 'Bittrex':
         return utils.parseApi.bittrex(body);
         break;
-      case 'novaexchange':
+      case 'Novaexchange':
         return utils.parseApi.novaexchange(body);
         break;
-      case 'cryptopia':
+      case 'Cryptopia':
         return utils.parseApi.cryptopia(body);
         break;
       default:

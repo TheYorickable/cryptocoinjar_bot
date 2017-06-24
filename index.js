@@ -5,14 +5,7 @@ const utils = require('./utils');
 const ua = require('universal-analytics');
 
 const bot = new TelegramBot(options.token, {polling: true});
-
-const ticker = {
-  poloniex: null,
-  bittrex: null,
-  novaexchange: null,
-  cryptopia: null
-};
-
+const ticker = {};
 
 function sendMessage(chatId, message) {
 
@@ -43,43 +36,25 @@ bot.onText(/\/p (.+)/, (msg, match) => {
     coin = pairs[1];
   }
 
-  const poloniexData = utils.getTickerData(ticker.poloniex, base, coin);
-  const bittrexData = utils.getTickerData(ticker.bittrex, base, coin);
-  const novaexchangeData = utils.getTickerData(ticker.novaexchange, base, coin);
-  const cryptopiaData = utils.getTickerData(ticker.cryptopia, coin, base);
-
   var message = [];
-  if (poloniexData !== null) {
-      message.push('➡️ Poloniex');
-      message.push('*' + poloniexData.last + ' ' + base + '  /  ' + utils.getPercentage(poloniexData.percentChange) + '*');
-      message.push('High / Low: ' + poloniexData.high + ' / ' + poloniexData.low);
-      message.push('Volume: ' + round(poloniexData.volume) + ' ' + base);
+
+  Object.keys(ticker).forEach((key) => {
+    var data = null;
+
+    if (key == 'Cryptopia') {
+      data = utils.getTickerData(ticker[key], coin, base);
+    } else {
+      data = utils.getTickerData(ticker[key], base, coin);
+    }
+
+    if (data !== null) {
+      message.push('➡️ ' + key);
+      message.push('*' + data.last + ' ' + base + '  /  ' + utils.getPercentage(data.percentChange) + '*');
+      message.push('High / Low: ' + data.high + ' / ' + data.low);
+      message.push('Volume: ' + round(data.volume) + ' ' + base);
       message.push('');
-  }
-
-  if (bittrexData !== null) {
-    message.push('➡️ Bittrex');
-    message.push('*' + bittrexData.last + ' ' + base + '  /  ' + utils.getPercentage(bittrexData.percentChange) + '*');
-    message.push('High / Low: ' + bittrexData.high + ' / ' + bittrexData.low);
-    message.push('Volume: ' + round(bittrexData.volume) + ' ' + base);
-    message.push('');
-  }
-
-  if (novaexchangeData !== null) {
-    message.push('➡️ Novaexchange');
-    message.push('*' + novaexchangeData.last + ' ' + base + '  /  ' + utils.getPercentage(novaexchangeData.percentChange) + '*');
-    message.push('High / Low: ' + novaexchangeData.high + ' / ' + novaexchangeData.low);
-    message.push('Volume: ' + round(novaexchangeData.volume) + ' ' + base);
-    message.push('');
-  }
-
-  if (cryptopiaData !== null) {
-    message.push('➡️ Cryptopia');
-    message.push('*' + cryptopiaData.last + ' ' + base + '  /  ' + utils.getPercentage(cryptopiaData.percentChange) + '*');
-    message.push('High / Low: ' + cryptopiaData.high + ' / ' + cryptopiaData.low);
-    message.push('Volume: ' + round(cryptopiaData.volume) + ' ' + base);
-    message.push('');
-  }
+    }
+  });
 
   if (message.length !== 0) {
     message.unshift('');
@@ -105,6 +80,10 @@ bot.on('message', (msg) => {
   var chatId = msg.chat.id;
   var visitor = ua('UA-99595475-3', msg.from.id, {https: true});
   console.log('Message received');
+  console.log('From: ' + msg.chat.username)
+  console.log('Message: ' + msg.text);
+  console.log('Datetime: ' + new Date());
+  console.log('--------------------------------');
   visitor.event("Message", "Received", 'aap', 'gaap').send();
 });
 
