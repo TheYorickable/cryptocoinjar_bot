@@ -8,7 +8,6 @@ const bot = new TelegramBot(options.token, {polling: true});
 const ticker = {};
 
 function sendMessage(chatId, message) {
-
   var markup = '';
 
   message.forEach((txt) => {
