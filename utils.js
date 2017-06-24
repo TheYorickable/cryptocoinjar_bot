@@ -85,6 +85,14 @@ var utils = {
     }
 
     return body;
+  },
+
+  getTickerData(data, base, coin) {
+    if (data[base + '_' + coin] !== undefined) {
+      return data[base + '_' + coin];
+    } else {
+      return null;
+    }
   }
 }
 

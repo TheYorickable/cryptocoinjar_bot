@@ -25,72 +25,56 @@ function sendMessage(chatId, message) {
   bot.sendMessage(chatId, markup, {'parse_mode': 'Markdown'});
 }
 
-function getBittrexData(coin) {
-  if (ticker.bittrex['BTC_' + coin] !== undefined) {
-    return ticker.bittrex['BTC_' + coin];
-  } else {
-    return null;
-  }
-}
-
-function getPoloniexData(coin) {
-  if (ticker.poloniex['BTC_' + coin] !== undefined) {
-    return ticker.poloniex['BTC_' + coin];
-  } else {
-    return null;
-  }
-}
-
-function getNovaexchangeData(coin) {
-  if (ticker.novaexchange['BTC_' + coin] !== undefined) {
-    return ticker.novaexchange['BTC_' + coin];
-  } else {
-    return null;
-  }}
-
 function round(num) {
   return Math.round(num * 100) / 100;
 }
 
-bot.onText(/\/p (.+)/, (msg, match) => {
-  const chatId = msg.chat.id;
-  const coin = match[1].toUpperCase();
+bot.onText(/\!(.+)/, (msg, match) => {
+  var chatId = msg.chat.id;
+  var coin = match[1].toUpperCase();
 
-  const poloniexData = getPoloniexData(coin);
-  const bittrexData = getBittrexData(coin);
-  const novaexchangeData = getNovaexchangeData(coin);
+  var regex = /[a-zA-Z]+/g;
+  var pairs = coin.match(regex);
+
+  var base = 'BTC';
+
+  if (pairs.length === 2) {
+    base = pairs[0];
+    coin = pairs[1];
+  }
+
+  const poloniexData = utils.getTickerData(ticker.poloniex, base, coin);
+  const bittrexData = utils.getTickerData(ticker.bittrex, base, coin);
+  const novaexchangeData = utils.getTickerData(ticker.novaexchange, base, coin);
 
   var message = [];
-
   if (poloniexData !== null) {
       message.push('➡️ Poloniex');
-      message.push('*' + poloniexData.last + '  /  ' + utils.getPercentage(poloniexData.percentChange) + '*');
+      message.push('*' + poloniexData.last + ' ' + base + '  /  ' + utils.getPercentage(poloniexData.percentChange) + '*');
       message.push('High / Low: ' + poloniexData.high + ' / ' + poloniexData.low);
-      message.push('Volume: ' + round(poloniexData.volume) + ' BTC');
+      message.push('Volume: ' + round(poloniexData.volume) + ' ' + base);
       message.push('');
   }
 
   if (bittrexData !== null) {
-    var percentChangeBittrex = Math.round((bittrexData.Last / bittrexData.PrevDay * 100 - 100) * 100)/100;
-
     message.push('➡️ Bittrex');
-    message.push('*' + bittrexData.last + '  /  ' + utils.getPercentage(bittrexData.percentChange) + '*');
+    message.push('*' + bittrexData.last + ' ' + base + '  /  ' + utils.getPercentage(bittrexData.percentChange) + '*');
     message.push('High / Low: ' + bittrexData.high + ' / ' + bittrexData.low);
-    message.push('Volume: ' + round(bittrexData.volume) + ' BTC');
+    message.push('Volume: ' + round(bittrexData.volume) + ' ' + base);
     message.push('');
   }
 
   if (novaexchangeData !== null) {
     message.push('➡️ Novaexchange');
-    message.push('*' + novaexchangeData.last + '  /  ' + utils.getPercentage(novaexchangeData.percentChange) + '*');
+    message.push('*' + novaexchangeData.last + ' ' + base + '  /  ' + utils.getPercentage(novaexchangeData.percentChange) + '*');
     message.push('High / Low: ' + novaexchangeData.high + ' / ' + novaexchangeData.low);
-    message.push('Volume: ' + round(novaexchangeData.volume) + ' BTC');
+    message.push('Volume: ' + round(novaexchangeData.volume) + ' ' + base);
     message.push('');
   }
 
   if (message.length !== 0) {
     message.unshift('');
-    message.unshift('📈 BTC / ' + coin + ' 24hr');
+    message.unshift('📈 ' + base + ' / ' + coin + ' 24hr');
   }
 
   if (options.fanboyApproved.indexOf(coin) !== -1) {
@@ -98,7 +82,7 @@ bot.onText(/\/p (.+)/, (msg, match) => {
   }
 
   if (message.length === 0) {
-    message.push(coin + ' was not found on Poloniex / Bittrex / Novaexchange');
+    message.push(' was not found on Poloniex / Bittrex / Novaexchange');
   }
 
   sendMessage(chatId, message);
