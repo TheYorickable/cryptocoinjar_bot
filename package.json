@@ -2,6 +2,7 @@
   "dependencies": {
     "botanio": "0.0.6",
     "node-telegram-bot-api": "^0.27.1",
-    "request": "^2.81.0"
+    "request": "^2.81.0",
+    "universal-analytics": "^0.4.13"
   }
 }

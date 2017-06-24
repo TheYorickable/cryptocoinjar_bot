@@ -1,6 +1,8 @@
 const TelegramBot = require('node-telegram-bot-api');
 const request = require('request');
 const options = require('./options');
+const ua = require('universal-analytics');
+
 
 const token = '429017792:AAEEFiDAMmwvfQFbrwzNrpj8WWQ61y1DO1I';
 
@@ -135,6 +137,14 @@ bot.onText(/\/p (.+)/, (msg, match) => {
 
   sendMessage(chatId, message);
 });
+
+bot.on('message', (msg) => {
+  const chatId = msg.chat.id;
+  const visitor = ua('UA-99595475-3', msg.from.id, {https: true});
+  console.log('Message received');
+  visitor.event("Message", "Received", 'Catch-all', msg.text).send();
+});
+
 
 setInterval(() => {
   options.apis.forEach((api) => {
