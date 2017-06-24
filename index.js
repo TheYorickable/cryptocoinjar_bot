@@ -3,14 +3,14 @@ const request = require('request');
 const options = require('./options');
 const utils = require('./utils');
 const ua = require('universal-analytics');
-const token = '';
 
 const bot = new TelegramBot(options.token, {polling: true});
 
 const ticker = {
   poloniex: null,
   bittrex: null,
-  novaexchange: null
+  novaexchange: null,
+  cryptopia: null
 };
 
 
@@ -29,7 +29,7 @@ function round(num) {
   return Math.round(num * 100) / 100;
 }
 
-bot.onText(/\!(.+)/, (msg, match) => {
+bot.onText(/\/p (.+)/, (msg, match) => {
   var chatId = msg.chat.id;
   var coin = match[1].toUpperCase();
 
@@ -46,6 +46,7 @@ bot.onText(/\!(.+)/, (msg, match) => {
   const poloniexData = utils.getTickerData(ticker.poloniex, base, coin);
   const bittrexData = utils.getTickerData(ticker.bittrex, base, coin);
   const novaexchangeData = utils.getTickerData(ticker.novaexchange, base, coin);
+  const cryptopiaData = utils.getTickerData(ticker.cryptopia, coin, base);
 
   var message = [];
   if (poloniexData !== null) {
@@ -72,6 +73,14 @@ bot.onText(/\!(.+)/, (msg, match) => {
     message.push('');
   }
 
+  if (cryptopiaData !== null) {
+    message.push('➡️ Cryptopia');
+    message.push('*' + cryptopiaData.last + ' ' + base + '  /  ' + utils.getPercentage(cryptopiaData.percentChange) + '*');
+    message.push('High / Low: ' + cryptopiaData.high + ' / ' + cryptopiaData.low);
+    message.push('Volume: ' + round(cryptopiaData.volume) + ' ' + base);
+    message.push('');
+  }
+
   if (message.length !== 0) {
     message.unshift('');
     message.unshift('📈 ' + base + ' / ' + coin + ' 24hr');
@@ -81,8 +90,12 @@ bot.onText(/\!(.+)/, (msg, match) => {
     message.push(coin + ' is Fanboy Approved 🔥');
   }
 
+  if (options.scamcoins.indexOf(coin) !== -1) {
+    message.push('⚠️ ' + coin + ' is most likely a scamcoin ⚠️');
+  }
+
   if (message.length === 0) {
-    message.push(' was not found on Poloniex / Bittrex / Novaexchange');
+    message.push(' was not found on Poloniex / Bittrex / Novaexchange / Cryptopia');
   }
 
   sendMessage(chatId, message);
@@ -100,5 +113,6 @@ setInterval(() => {
     request(api.ticker, function (error, response, body) {
       ticker[api.name] = utils.parseTicker(api.name, JSON.parse(body));
     });
+
   })
 }, 5000);

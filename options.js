@@ -1,14 +1,15 @@
 module.exports = {
-  token: '429017792:AAEEFiDAMmwvfQFbrwzNrpj8WWQ61y1DO1I',
+  token: '440146541:AAHi27qwJArLJ-o4qrncYM0mYGC_4y97IAk',
+  // token: '429017792:AAEEFiDAMmwvfQFbrwzNrpj8WWQ61y1DO1I',
   intervalChats: [
     -237161017,
     114791921
   ],
   fanboyApproved: [
-    'NLG',
-    'APX',
-    'ESP2',
-    'XRP'
+
+  ],
+  scamcoins: [
+    'DGB',
   ],
   apis: [
     {
@@ -22,6 +23,10 @@ module.exports = {
     {
       name: 'novaexchange',
       ticker: 'https://novaexchange.com/remote/v2/markets/'
+    },
+    {
+      name: 'cryptopia',
+      ticker: 'https://www.cryptopia.co.nz/api/GetMarkets'
     }
   ]
 };

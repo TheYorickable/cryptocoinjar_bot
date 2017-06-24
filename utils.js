@@ -68,6 +68,24 @@ var utils = {
       })
 
       return data;
+    },
+
+    cryptopia: (body) => {
+      var data = [];
+
+      body.Data.forEach((market) => {
+        var regex = /[a-zA-Z]+/g;
+        var result = market.Label.match(regex);
+        data[result[0] + '_' + result[1]] = {
+          last: market.LastPrice,
+          percentChange: market.Change,
+          high: market.High,
+          low: market.Low,
+          volume: market.BuyVolume
+        };
+      });
+
+      return data;
     }
   },
 
@@ -81,6 +99,10 @@ var utils = {
         break;
       case 'novaexchange':
         return utils.parseApi.novaexchange(body);
+        break;
+      case 'cryptopia':
+        return utils.parseApi.cryptopia(body);
+        break;
       default:
     }
 
