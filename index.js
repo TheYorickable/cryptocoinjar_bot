@@ -1,12 +1,11 @@
 const TelegramBot = require('node-telegram-bot-api');
 const request = require('request');
 const options = require('./options');
+const utils = require('./utils');
 const ua = require('universal-analytics');
+const token = '';
 
-
-const token = '429017792:AAEEFiDAMmwvfQFbrwzNrpj8WWQ61y1DO1I';
-
-const bot = new TelegramBot(token, {polling: true});
+const bot = new TelegramBot(options.token, {polling: true});
 
 const ticker = {
   poloniex: null,
@@ -27,15 +26,11 @@ function sendMessage(chatId, message) {
 }
 
 function getBittrexData(coin) {
-  var coinData = null;
-
-  ticker.bittrex.result.forEach((data) => {
-    if (data.MarketName === 'BTC-' + coin) {
-      coinData = data;
-    }
-  })
-
-  return coinData;
+  if (ticker.bittrex['BTC_' + coin] !== undefined) {
+    return ticker.bittrex['BTC_' + coin];
+  } else {
+    return null;
+  }
 }
 
 function getPoloniexData(coin) {
@@ -47,38 +42,11 @@ function getPoloniexData(coin) {
 }
 
 function getNovaexchangeData(coin) {
-  var coindata = null;
-
-  ticker.novaexchange.markets.forEach((data) => {
-    if (data.marketname === 'BTC_' + coin) {
-      coindata = data;
-    }
-  });
-
-  return coindata;
-}
-
-function getPercentage(perc) {
-  var string = '';
-
-  if (perc >= 0) {
-    string += '+' + perc + '% 🔵  ';
+  if (ticker.novaexchange['BTC_' + coin] !== undefined) {
+    return ticker.novaexchange['BTC_' + coin];
   } else {
-    string += perc + '% 🔴  ';
-  }
-
-  if (perc >= 100) {
-    string += '🚀 🌕';
-  } else if (perc >= 50) {
-    string += '🚀';
-  } else if (perc >= 30) {
-    string += '🛩☁️';
-  } else if (perc >= 15) {
-    string += '🚤';
-  }
-
-  return string;
-}
+    return null;
+  }}
 
 function round(num) {
   return Math.round(num * 100) / 100;
@@ -95,30 +63,28 @@ bot.onText(/\/p (.+)/, (msg, match) => {
   var message = [];
 
   if (poloniexData !== null) {
-      var percentChangePoloniex = Math.round((poloniexData.percentChange * 100) * 100) / 100;
-
       message.push('➡️ Poloniex');
-      message.push('*' + poloniexData.last + '  /  ' + getPercentage(percentChangePoloniex) + '*');
-      message.push('High / Low: ' + poloniexData.high24hr + ' / ' + poloniexData.low24hr);
-      message.push('Volume: ' + round(poloniexData.baseVolume) + ' BTC');
+      message.push('*' + poloniexData.last + '  /  ' + utils.getPercentage(poloniexData.percentChange) + '*');
+      message.push('High / Low: ' + poloniexData.high + ' / ' + poloniexData.low);
+      message.push('Volume: ' + round(poloniexData.volume) + ' BTC');
       message.push('');
   }
 
   if (bittrexData !== null) {
-    const percentChangeBittrex = Math.round((bittrexData.Last / bittrexData.PrevDay * 100 - 100) * 100)/100;
+    var percentChangeBittrex = Math.round((bittrexData.Last / bittrexData.PrevDay * 100 - 100) * 100)/100;
 
     message.push('➡️ Bittrex');
-    message.push('*' + bittrexData.Last + '  /  ' + getPercentage(percentChangeBittrex) + '*');
-    message.push('high / low: ' + bittrexData.High + ' / ' + bittrexData.Low);
-    message.push('Volume: ' + round(bittrexData.Volume) + ' BTC');
+    message.push('*' + bittrexData.last + '  /  ' + utils.getPercentage(bittrexData.percentChange) + '*');
+    message.push('High / Low: ' + bittrexData.high + ' / ' + bittrexData.low);
+    message.push('Volume: ' + round(bittrexData.volume) + ' BTC');
     message.push('');
   }
 
   if (novaexchangeData !== null) {
     message.push('➡️ Novaexchange');
-    message.push('*' + novaexchangeData.last_price + '  /  ' + getPercentage(novaexchangeData.change24h) + '*');
-    message.push('high / low: ' + novaexchangeData.high24h + ' / ' + novaexchangeData.low24h);
-    message.push('Volume: ' + round(novaexchangeData.volume24h) + ' BTC');
+    message.push('*' + novaexchangeData.last + '  /  ' + utils.getPercentage(novaexchangeData.percentChange) + '*');
+    message.push('High / Low: ' + novaexchangeData.high + ' / ' + novaexchangeData.low);
+    message.push('Volume: ' + round(novaexchangeData.volume) + ' BTC');
     message.push('');
   }
 
@@ -139,17 +105,16 @@ bot.onText(/\/p (.+)/, (msg, match) => {
 });
 
 bot.on('message', (msg) => {
-  const chatId = msg.chat.id;
-  const visitor = ua('UA-99595475-3', msg.from.id, {https: true});
+  var chatId = msg.chat.id;
+  var visitor = ua('UA-99595475-3', msg.from.id, {https: true});
   console.log('Message received');
-  visitor.event("Message", "Received", 'Catch-all', msg.text).send();
+  visitor.event("Message", "Received", 'aap', 'gaap').send();
 });
-
 
 setInterval(() => {
   options.apis.forEach((api) => {
     request(api.ticker, function (error, response, body) {
-      ticker[api.name] = JSON.parse(body);
+      ticker[api.name] = utils.parseTicker(api.name, JSON.parse(body));
     });
   })
 }, 5000);

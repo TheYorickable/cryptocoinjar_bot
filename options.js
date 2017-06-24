@@ -1,4 +1,5 @@
 module.exports = {
+  token: '429017792:AAEEFiDAMmwvfQFbrwzNrpj8WWQ61y1DO1I',
   intervalChats: [
     -237161017,
     114791921
