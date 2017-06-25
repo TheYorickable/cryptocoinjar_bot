@@ -75,6 +75,31 @@ bot.onText(/\/p (.+)/, (msg, match) => {
   sendMessage(chatId, message);
 });
 
+bot.onText(/\/fancoins/, (msg, match) => {
+  var chatId = msg.chat.id;
+  var base = 'BTC';
+
+  var message = [];
+
+  options.fanboyApproved.forEach((coin) => {
+    message.push('📈 *' + coin + '* 24hr');
+    Object.keys(ticker).forEach((key) => {
+      var data = null;
+      if (key == 'Cryptopia') {
+        data = utils.getTickerData(ticker[key], coin, base);
+      } else {
+        data = utils.getTickerData(ticker[key], base, coin);
+      }
+      if (data !== null) {
+        message.push(key + ':');
+        message.push('*' + data.last + ' ' + base + '  /  ' + utils.getPercentage(data.percentChange) + '*');
+      }
+    });
+  })
+
+  sendMessage(chatId, message);
+});
+
 bot.on('message', (msg) => {
   var chatId = msg.chat.id;
   var visitor = ua('UA-99595475-3', msg.from.id, {https: true});
