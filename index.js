@@ -100,6 +100,16 @@ bot.onText(/\/fancoins/, (msg, match) => {
   sendMessage(chatId, message);
 });
 
+bot.onText(/\/bloodbath/, (msg, match) => {
+  var chatId = msg.chat.id;
+
+  var message = [];
+
+  message.push(options.motivate[0]);
+
+  sendMessage(chatId, message);
+});
+
 bot.on('message', (msg) => {
   var chatId = msg.chat.id;
   var visitor = ua('UA-99595475-3', msg.from.id, {https: true});
