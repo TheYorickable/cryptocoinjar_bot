@@ -5,6 +5,8 @@ const utils = require('./utils');
 const ua = require('universal-analytics');
 
 const bot = new TelegramBot(options.token, {polling: true});
+const espBot = new TelegramBot('347347975:AAFYyA2xPUG3KqMNdVcRxwwAN3_SCDHTPLE', {polling: true});
+
 const ticker = {};
 
 function sendMessage(chatId, message) {
@@ -17,9 +19,38 @@ function sendMessage(chatId, message) {
   bot.sendMessage(chatId, markup, {'parse_mode': 'Markdown'});
 }
 
+function espSendMessage(chatId, message) {
+  var markup = '';
+
+  message.forEach((txt) => {
+    markup += txt + '\n';
+  });
+
+  espBot.sendMessage(chatId, markup, {'parse_mode': 'Markdown'});
+}
+
 function round(num) {
   return Math.round(num * 100) / 100;
 }
+
+espBot.onText(/\/price/, (msg, match) => {
+  var chatId = msg.chat.id;
+  var base = 'BTC'
+
+  data = utils.getTickerData(ticker.Novaexchange, base, 'ESP2');
+
+  var message = [];
+
+  if (data !== null) {
+    message.push('➡️ ESP: Novaexchange');
+    message.push('*' + utils.getNumber(data.last, base) + ' ' + base + '  /  ' + utils.getPercentage(data.percentChange) + '*');
+    message.push('High / Low: ' + utils.getNumber(data.high, base) + ' / ' + utils.getNumber(data.low, base));
+    message.push('Volume: ' + round(data.volume) + ' ' + base);
+    message.push('');
+  }
+
+  espSendMessage(chatId, message);
+});
 
 bot.onText(/\/p (.+)/, (msg, match) => {
   var chatId = msg.chat.id;
@@ -48,8 +79,8 @@ bot.onText(/\/p (.+)/, (msg, match) => {
 
     if (data !== null) {
       message.push('➡️ ' + key);
-      message.push('*' + data.last + ' ' + base + '  /  ' + utils.getPercentage(data.percentChange) + '*');
-      message.push('High / Low: ' + data.high + ' / ' + data.low);
+      message.push('*' + utils.getNumber(data.last, base) + ' ' + base + '  /  ' + utils.getPercentage(data.percentChange) + '*');
+      message.push('High / Low: ' + utils.getNumber(data.high, base) + ' / ' + utils.getNumber(data.low, base));
       message.push('Volume: ' + round(data.volume) + ' ' + base);
       message.push('');
     }
@@ -92,7 +123,7 @@ bot.onText(/\/fancoins/, (msg, match) => {
       }
       if (data !== null) {
         message.push(key + ':');
-        message.push('*' + data.last + ' ' + base + '  /  ' + utils.getPercentage(data.percentChange) + '*');
+        message.push('*' + utils.getNumber(data.last, base) + ' ' + base + '  /  ' + utils.getPercentage(data.percentChange) + '*');
       }
     });
   })
@@ -102,10 +133,31 @@ bot.onText(/\/fancoins/, (msg, match) => {
 
 bot.onText(/\/bloodbath/, (msg, match) => {
   var chatId = msg.chat.id;
-
   var message = [];
 
-  message.push(options.motivate[0]);
+  options.motivate.slice(-1)[0].forEach((yell) => {
+    message.push(yell);
+  });
+
+  sendMessage(chatId, message);
+});
+
+bot.onText(/\/link/, (msg, match) => {
+  var chatId = msg.chat.id;
+
+  var message = [];
+  message.push('➡️ CryptoGlobal')
+  message.push('')
+  message.push(options.groupLink);
+
+  sendMessage(chatId, message);
+});
+
+bot.onText(/\/disclaimer/, (msg, match) => {
+  var chatId = msg.chat.id;
+
+  var message = [];
+  message.push('⚠️ Disclaimer: ' + options.disclaimer);
 
   sendMessage(chatId, message);
 });

@@ -81,7 +81,7 @@ var utils = {
           percentChange: market.Change,
           high: market.High,
           low: market.Low,
-          volume: market.BuyVolume
+          volume: market.BaseVolume
         };
       });
 
@@ -109,11 +109,19 @@ var utils = {
     return body;
   },
 
-  getTickerData(data, base, coin) {
+  getTickerData: (data, base, coin) => {
     if (data[base + '_' + coin] !== undefined) {
       return data[base + '_' + coin];
     } else {
       return null;
+    }
+  },
+
+  getNumber: (num, base) => {
+    if (base === 'BTC') {
+      return parseFloat(num).toFixed(8);
+    } else {
+      return num;
     }
   }
 }
