@@ -2,10 +2,11 @@ const TelegramBot = require('node-telegram-bot-api');
 const request = require('request');
 const options = require('./options');
 const utils = require('./utils');
+const env = require('./env');
 const ua = require('universal-analytics');
 
-const bot = new TelegramBot(options.token, {polling: true});
-const espBot = new TelegramBot('347347975:AAFYyA2xPUG3KqMNdVcRxwwAN3_SCDHTPLE', {polling: true});
+const bot = new TelegramBot(env.ccjBotToken, {polling: true});
+const espBot = new TelegramBot(env.espBotToken, {polling: true});
 
 const ticker = {};
 
@@ -170,7 +171,7 @@ bot.on('message', (msg) => {
   console.log('Message: ' + msg.text);
   console.log('Datetime: ' + new Date());
   console.log('--------------------------------');
-  visitor.event("Message", "Received", 'aap', 'gaap').send();
+  visitor.event("Message", "Received").send();
 });
 
 setInterval(() => {
@@ -178,6 +179,5 @@ setInterval(() => {
     request(api.ticker, function (error, response, body) {
       ticker[api.name] = utils.parseTicker(api.name, JSON.parse(body));
     });
-
   })
 }, 5000);
