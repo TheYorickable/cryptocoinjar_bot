@@ -6,7 +6,6 @@ const env = require('./env');
 const ua = require('universal-analytics');
 
 const bot = new TelegramBot(env.ccjBotToken, {polling: true});
-const espBot = new TelegramBot(env.espBotToken, {polling: true});
 
 const ticker = {};
 
@@ -19,39 +18,6 @@ function sendMessage(chatId, message) {
 
   bot.sendMessage(chatId, markup, {'parse_mode': 'Markdown'});
 }
-
-function espSendMessage(chatId, message) {
-  var markup = '';
-
-  message.forEach((txt) => {
-    markup += txt + '\n';
-  });
-
-  espBot.sendMessage(chatId, markup, {'parse_mode': 'Markdown'});
-}
-
-function round(num) {
-  return Math.round(num * 100) / 100;
-}
-
-espBot.onText(/\/price/, (msg, match) => {
-  var chatId = msg.chat.id;
-  var base = 'BTC'
-
-  data = utils.getTickerData(ticker.Novaexchange, base, 'ESP2');
-
-  var message = [];
-
-  if (data !== null) {
-    message.push('➡️ ESP: Novaexchange');
-    message.push('*' + utils.getNumber(data.last, base) + ' ' + base + '  /  ' + utils.getPercentage(data.percentChange) + '*');
-    message.push('High / Low: ' + utils.getNumber(data.high, base) + ' / ' + utils.getNumber(data.low, base));
-    message.push('Volume: ' + round(data.volume) + ' ' + base);
-    message.push('');
-  }
-
-  espSendMessage(chatId, message);
-});
 
 bot.onText(/\/p (.+)/, (msg, match) => {
   var chatId = msg.chat.id;
@@ -181,3 +147,41 @@ setInterval(() => {
     });
   })
 }, 5000);
+
+
+if (typeof env.espBotToken !== 'undefined') {
+  const espBot = new TelegramBot(env.espBotToken, {polling: true});
+
+  function espSendMessage(chatId, message) {
+    var markup = '';
+
+    message.forEach((txt) => {
+      markup += txt + '\n';
+    });
+
+    espBot.sendMessage(chatId, markup, {'parse_mode': 'Markdown'});
+  }
+
+  function round(num) {
+    return Math.round(num * 100) / 100;
+  }
+
+  espBot.onText(/\/price/, (msg, match) => {
+    var chatId = msg.chat.id;
+    var base = 'BTC'
+
+    data = utils.getTickerData(ticker.Novaexchange, base, 'ESP2');
+
+    var message = [];
+
+    if (data !== null) {
+      message.push('➡️ ESP: Novaexchange');
+      message.push('*' + utils.getNumber(data.last, base) + ' ' + base + '  /  ' + utils.getPercentage(data.percentChange) + '*');
+      message.push('High / Low: ' + utils.getNumber(data.high, base) + ' / ' + utils.getNumber(data.low, base));
+      message.push('Volume: ' + round(data.volume) + ' ' + base);
+      message.push('');
+    }
+
+    espSendMessage(chatId, message);
+  });
+}
