@@ -1,3 +1,5 @@
+Telegram bot for fetching last price of trading pairs on multiple exchanges.
+
 ## Install
 Install dependencies using `$ npm i`
 
@@ -12,3 +14,9 @@ module.exports = {
 ```
 
 Enter your api key and run `$ node index.js`
+
+## Todo
+- Charts
+- Add exchanges: Coinexchange, Poswallet
+- Better way of fetching exchanges
+- New structure of receiving and sending messages..
